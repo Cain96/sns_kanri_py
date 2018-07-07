@@ -1,0 +1,50 @@
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
+      - image: circleci/python:3.6.1
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      - image: circleci/postgres:9.5
+        environment:
+          POSTGRES_USER: circleci
+          POSTGRES_DB: circle_test
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            pip install coverage flake8 isort 'pylint>=1.7,<1.8' pylint-django
+
+      # run tests!
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            coverage run --source=sns_kanri manage.py test --settings=sns_kanri.ci_settings --noinput
+            coverage report
+            coverage html
+            mv htmlcov ../
+            flake8 sns_kanri
+            isort --recursive --check-only --diff sns_kanri
+            pylint --load-plugins=pylint_django --rcfile .pylintrc sns_kanri || exit 0
+
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports

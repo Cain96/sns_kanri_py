@@ -12,6 +12,7 @@ class SNS(BaseModel):
         ]
 
     name = models.CharField("名称", max_length=256)
+    path = models.CharField("ファイルパス", max_length=1024, blank=True)
 
     def __str__(self):
         return self.name

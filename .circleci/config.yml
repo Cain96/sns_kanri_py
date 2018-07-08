@@ -48,3 +48,11 @@ jobs:
       - store_artifacts:
           path: test-reports
           destination: test-reports
+
+    deployment:
+      staging:
+        branch: master
+        heroku:
+          commands:
+            - git push git@heroku.com:calm-stream-98493.git $CIRCLE_SHA1:master
+            - heroku run python manage.py migrate

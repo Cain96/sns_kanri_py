@@ -9,6 +9,7 @@ class SNSSerializer(serializers.ModelSerializer):
     class Meta:
         model = SNS
         fields = (
+            'id',
             'name',
             'path'
         )

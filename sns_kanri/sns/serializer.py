@@ -34,7 +34,8 @@ class RecordSerializer(serializers.ModelSerializer):
     )
 
     sns = SNSField()
-    updated = CustomTimeField()
+
+    updated = serializers.DateTimeField(format='%Y-%m-%d %H:%M', read_only=True)
 
     class Meta:
         model = Record
@@ -44,8 +45,4 @@ class RecordSerializer(serializers.ModelSerializer):
             'date',
             'time',
             'updated'
-        )
-        read_only_fiedls = (
-            'user',
-            'updated',
         )

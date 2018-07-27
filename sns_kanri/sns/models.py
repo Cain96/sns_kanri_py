@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 
 from sns_kanri.master.models import User
@@ -8,11 +10,11 @@ class SNS(BaseModel):
     class Meta:
         verbose_name = verbose_name_plural = "SNS"
         ordering = [
-            "-created",
+            "created",
         ]
 
     name = models.CharField("名称", max_length=256)
-    path = models.CharField("ファイルパス", max_length=1024, blank=True)
+    color = models.CharField("カラー", max_length=7, blank=True)
 
     def __str__(self):
         return self.name
@@ -32,3 +34,8 @@ class Record(BaseModel):
 
     def __str__(self):
         return str(self.id)
+
+class Statistic(object):
+    def __init__(self, date: datetime.date, sns: list):
+        self.date = date
+        self.sns = sns

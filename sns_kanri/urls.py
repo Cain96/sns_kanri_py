@@ -19,13 +19,14 @@ from rest_framework_jwt.views import obtain_jwt_token
 
 from sns_kanri import settings
 from sns_kanri.master.urls import router as master_router
-from sns_kanri.sns.urls import router as sns_router
+from sns_kanri.sns.urls import router as sns_router, statistic_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/login/', obtain_jwt_token),
     path('api/', include(sns_router.urls)),
     path('api/', include(master_router.urls)),
+    path('api/statistic/', include(statistic_urlpatterns))
 ]
 
 if settings.DEBUG:

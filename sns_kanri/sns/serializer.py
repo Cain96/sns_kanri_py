@@ -48,7 +48,6 @@ class RecordSerializer(serializers.ModelSerializer):
             'updated'
         )
 
-
 class StatisticSerializer(serializers.Serializer):
     date = serializers.DateField(read_only=True)
     sns = serializers.ListField(read_only=True)

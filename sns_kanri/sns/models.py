@@ -35,7 +35,6 @@ class Record(BaseModel):
     def __str__(self):
         return str(self.id)
 
-
 class Statistic(object):
     def __init__(self, date: datetime.date, sns: list):
         self.date = date

@@ -60,7 +60,7 @@ class StatisticListView(generics.ListAPIView):
                     times = date_records.filter(sns=sns).values_list('time', flat=True)
                     times = map(lambda time: dt.combine(datetime.date.min, time) - dt.min, times)
                     total_time = int(sum(times, datetime.timedelta()).total_seconds())
-                    sns_list.append("{:.1f}".format(total_time / 3600))
+                    sns_list.append(total_time / 3600)
                 statistic_list.append(Statistic(date, sns_list))
 
         data = self.get_serializer(statistic_list, many=True).data

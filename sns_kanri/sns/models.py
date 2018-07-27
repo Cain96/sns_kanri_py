@@ -8,11 +8,11 @@ class SNS(BaseModel):
     class Meta:
         verbose_name = verbose_name_plural = "SNS"
         ordering = [
-            "-created",
+            "created",
         ]
 
     name = models.CharField("名称", max_length=256)
-    path = models.CharField("ファイルパス", max_length=1024, blank=True)
+    color = models.CharField("カラー", max_length=7, blank=True)
 
     def __str__(self):
         return self.name

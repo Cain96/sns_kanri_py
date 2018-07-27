@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 
 from sns_kanri.master.models import User
@@ -32,3 +34,9 @@ class Record(BaseModel):
 
     def __str__(self):
         return str(self.id)
+
+
+class Statistic(object):
+    def __init__(self, date: datetime.date, sns: list):
+        self.date = date
+        self.sns = sns

@@ -40,9 +40,15 @@ class RecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Record
         fields = (
+            'id',
             'user',
             'sns',
             'date',
             'time',
             'updated'
         )
+
+
+class StatisticSerializer(serializers.Serializer):
+    date = serializers.DateField(read_only=True)
+    sns = serializers.ListField(read_only=True)

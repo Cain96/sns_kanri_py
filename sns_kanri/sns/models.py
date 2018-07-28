@@ -35,7 +35,14 @@ class Record(BaseModel):
     def __str__(self):
         return str(self.id)
 
+
 class Statistic(object):
     def __init__(self, date: datetime.date, sns: list):
         self.date = date
         self.sns = sns
+
+
+class Rate(object):
+    def __init__(self, sns: SNS, num: float):
+        self.sns = sns
+        self.num = num

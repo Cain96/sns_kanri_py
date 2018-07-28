@@ -85,6 +85,7 @@ class StatisticListView(generics.GenericAPIView):
                 total_time = int(sum(times, datetime.timedelta()).total_seconds())
                 rate_list.append(Rate(sns, (total_time / all_total_time) * 100))
 
+            rate_list.sort(key=lambda rate: rate.num, reverse=True)
             results['rate'] = RateSerializer(rate_list, many=True).data
 
         return Response(results)

@@ -6,10 +6,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from sns_kanri.sns.filter import RecordFilter
-from sns_kanri.sns.models import SNS, Record, Statistic
+from sns_kanri.sns.models import SNS, Rate, Record, Statistic
 from sns_kanri.sns.pagination import StandardResultsSetPagination
 from sns_kanri.sns.serializer import (
-    RecordSerializer, SNSSerializer, StatisticSerializer,
+    RateSerializer, RecordSerializer, SNSSerializer, StatisticSerializer,
 )
 from sns_kanri.utils import date_range
 
@@ -34,26 +34,33 @@ class RecordViewSet(viewsets.ModelViewSet):
         return queryset.filter(user=self.request.user)
 
 
-class StatisticListView(generics.ListAPIView):
+class StatisticListView(generics.GenericAPIView):
     """Statisticの一覧"""
     permission_classes = (IsAuthenticated,)
     filter_class = RecordFilter
-    serializer_class = StatisticSerializer
 
     def get_queryset(self):
-        return Record.objects.filter(user=self.request.user).select_related()
+        self.start_date = self.get_date("date_0")
+        self.end_date = self.get_date("date_1")
+        if self.start_date and self.end_date:
+            return Record.objects.filter(
+
+                user=self.request.user,
+                date__gte=self.start_date,
+                date__lte=self.end_date
+            ).select_related()
+        return Record.objects.filter(
+            user=self.request.user).select_related()
 
     def get(self, request, *args, **kwargs):
         results = {}
 
         queryset = self.filter_queryset(self.get_queryset())
         sns_queryset = SNS.objects.all()
-        start_date = self.get_date("date_0")
-        end_date = self.get_date("date_1")
-        statistic_list = []
 
-        if start_date and end_date:
-            for date in date_range(start_date, end_date):
+        if self.start_date and self.end_date:
+            statistic_list = []
+            for date in date_range(self.start_date, self.end_date):
                 sns_list = []
                 date_records = queryset.filter(date=date)
                 for sns in sns_queryset:
@@ -63,8 +70,18 @@ class StatisticListView(generics.ListAPIView):
                     sns_list.append(total_time / 3600)
                 statistic_list.append(Statistic(date, sns_list))
 
-        data = self.get_serializer(statistic_list, many=True).data
-        results['statistic'] = data
+            results['statistic'] = StatisticSerializer(statistic_list, many=True).data
+
+            rate_list = []
+            for sns in sns_queryset:
+                times = queryset.filter(sns=sns).values_list('time', flat=True)
+                if not times:
+                    continue
+                times = map(lambda time: dt.combine(datetime.date.min, time) - dt.min, times)
+                total_time = int(sum(times, datetime.timedelta()).total_seconds())
+                rate_list.append(Rate(sns, total_time / 3600))
+
+            results['rate'] = RateSerializer(rate_list, many=True).data
 
         return Response(results)
 

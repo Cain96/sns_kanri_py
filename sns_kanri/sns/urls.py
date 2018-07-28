@@ -9,5 +9,9 @@ router.register('sns', SNSViewSet)
 router.register('record', RecordViewSet)
 
 statistic_urlpatterns = [
-    path('', views.StatisticListView.as_view(), name='list')
+    path('', views.StatisticView.as_view(), name='list')
+]
+
+time_urlpatterns = [
+    path('', views.TimeView.as_view(), name='list')
 ]

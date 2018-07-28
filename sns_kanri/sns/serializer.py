@@ -48,10 +48,18 @@ class RecordSerializer(serializers.ModelSerializer):
             'updated'
         )
 
+
 class StatisticSerializer(serializers.Serializer):
     date = serializers.DateField(read_only=True)
     sns = serializers.ListField(read_only=True)
 
+
 class RateSerializer(serializers.Serializer):
     sns = SNSSerializer(read_only=True)
     num = serializers.FloatField(read_only=True)
+
+
+class TimeSerializer(serializers.Serializer):
+    day = serializers.FloatField(read_only=True)
+    week = serializers.FloatField(read_only=True)
+    month = serializers.FloatField(read_only=True)

@@ -73,13 +73,17 @@ class StatisticListView(generics.GenericAPIView):
             results['statistic'] = StatisticSerializer(statistic_list, many=True).data
 
             rate_list = []
+            times = queryset.values_list('time', flat=True)
+            times = map(lambda time: dt.combine(datetime.date.min, time) - dt.min, times)
+            all_total_time = int(sum(times, datetime.timedelta()).total_seconds())
+
             for sns in sns_queryset:
                 times = queryset.filter(sns=sns).values_list('time', flat=True)
                 if not times:
                     continue
                 times = map(lambda time: dt.combine(datetime.date.min, time) - dt.min, times)
                 total_time = int(sum(times, datetime.timedelta()).total_seconds())
-                rate_list.append(Rate(sns, total_time / 3600))
+                rate_list.append(Rate(sns, (total_time / all_total_time) * 100))
 
             results['rate'] = RateSerializer(rate_list, many=True).data
 

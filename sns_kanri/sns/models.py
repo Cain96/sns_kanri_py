@@ -46,3 +46,10 @@ class Rate(object):
     def __init__(self, sns: SNS, num: float):
         self.sns = sns
         self.num = num
+
+
+class Time(object):
+    def __init__(self, day: float, week: float, month: float):
+        self.day = day
+        self.week = week
+        self.month = month

@@ -6,12 +6,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from sns_kanri.sns.filter import RecordFilter
-from sns_kanri.sns.models import SNS, Rate, Record, Statistic
+from sns_kanri.sns.models import SNS, Rate, Record, Statistic, Time
 from sns_kanri.sns.pagination import StandardResultsSetPagination
 from sns_kanri.sns.serializer import (
     RateSerializer, RecordSerializer, SNSSerializer, StatisticSerializer,
+    TimeSerializer,
 )
-from sns_kanri.utils import date_range
+from sns_kanri.utils import date_range, get_total_time
 
 
 class SNSViewSet(viewsets.ModelViewSet):
@@ -34,8 +35,7 @@ class RecordViewSet(viewsets.ModelViewSet):
         return queryset.filter(user=self.request.user)
 
 
-class StatisticListView(generics.GenericAPIView):
-    """Statisticの一覧"""
+class StatisticView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)
     filter_class = RecordFilter
 
@@ -44,7 +44,6 @@ class StatisticListView(generics.GenericAPIView):
         self.end_date = self.get_date("date_1")
         if self.start_date and self.end_date:
             return Record.objects.filter(
-
                 user=self.request.user,
                 date__gte=self.start_date,
                 date__lte=self.end_date
@@ -64,18 +63,15 @@ class StatisticListView(generics.GenericAPIView):
                 sns_list = []
                 date_records = queryset.filter(date=date)
                 for sns in sns_queryset:
-                    times = date_records.filter(sns=sns).values_list('time', flat=True)
-                    times = map(lambda time: dt.combine(datetime.date.min, time) - dt.min, times)
-                    total_time = int(sum(times, datetime.timedelta()).total_seconds())
+                    times = date_records.filter(sns=sns)
+                    total_time = get_total_time(times)
                     sns_list.append(total_time / 3600)
                 statistic_list.append(Statistic(date, sns_list))
 
             results['statistic'] = StatisticSerializer(statistic_list, many=True).data
 
             rate_list = []
-            times = queryset.values_list('time', flat=True)
-            times = map(lambda time: dt.combine(datetime.date.min, time) - dt.min, times)
-            all_total_time = int(sum(times, datetime.timedelta()).total_seconds())
+            all_total_time = get_total_time(queryset)
 
             for sns in sns_queryset:
                 times = queryset.filter(sns=sns).values_list('time', flat=True)
@@ -97,3 +93,26 @@ class StatisticListView(generics.GenericAPIView):
             date = dt.strptime(date_str, "%Y-%m-%d")
             date = datetime.date(date.year, date.month, date.day)
         return date
+
+
+class TimeView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return Record.objects.filter(
+            user=self.request.user,
+            date__month=datetime.date.today().month
+        )
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        today = datetime.date.today()
+        month_time = get_total_time(queryset) / 3600
+
+        queryset = queryset.filter(date__gte=(today - datetime.timedelta(days=7)))
+        week_time = get_total_time(queryset) / 3600
+
+        queryset = queryset.filter(date=today)
+        day_time = get_total_time(queryset) / 3600
+
+        return Response(TimeSerializer(Time(day_time, week_time, month_time)).data)

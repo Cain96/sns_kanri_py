@@ -15,25 +15,35 @@ class SNSSerializer(serializers.ModelSerializer):
         )
 
 
-class CustomTimeField(serializers.TimeField):
+class RecordOutputSerializer(serializers.ModelSerializer):
+    updated = serializers.DateTimeField(format='%Y-%m-%d %H:%M', read_only=True)
+    sns = SNSSerializer(read_only=True)
 
-    def to_representation(self, value):
-        return datetime.strftime(value, '%Y-%m-%d %H:%M')
+    class Meta:
+        model = Record
+        fields = (
+            'id',
+            'user',
+            'sns',
+            'date',
+            'time',
+            'updated'
+        )
 
-
-class SNSField(serializers.PrimaryKeyRelatedField):
-    queryset = SNS.objects.all()
-
-    def to_representation(self, value):
-        return SNS.objects.get(id=value.pk).name
+        read_only = (
+            'id',
+            'user',
+            'sns',
+            'date',
+            'time',
+            'updated'
+        )
 
 
 class RecordSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
-
-    sns = SNSField()
 
     updated = serializers.DateTimeField(format='%Y-%m-%d %H:%M', read_only=True)
 

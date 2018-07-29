@@ -9,8 +9,8 @@ from sns_kanri.sns.filter import RecordFilter
 from sns_kanri.sns.models import SNS, Rate, Record, Statistic, Time
 from sns_kanri.sns.pagination import StandardResultsSetPagination
 from sns_kanri.sns.serializer import (
-    RateSerializer, RecordSerializer, SNSSerializer, StatisticSerializer,
-    TimeSerializer,
+    RateSerializer, RecordOutputSerializer, RecordSerializer, SNSSerializer,
+    StatisticSerializer, TimeSerializer,
 )
 from sns_kanri.utils import date_range, get_total_time
 
@@ -28,6 +28,19 @@ class RecordViewSet(viewsets.ModelViewSet):
     filter_class = RecordFilter
     pagination_class = StandardResultsSetPagination
     serializer_class = RecordSerializer
+    queryset = Record.objects.all()
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(user=self.request.user)
+
+
+class RecordOutputViewSet(viewsets.ModelViewSet):
+    """RecordOutputの一覧"""
+    permission_classes = (IsAuthenticated,)
+    filter_class = RecordFilter
+    pagination_class = StandardResultsSetPagination
+    serializer_class = RecordOutputSerializer
     queryset = Record.objects.all()
 
     def get_queryset(self):

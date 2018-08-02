@@ -114,13 +114,13 @@ class TimeView(generics.GenericAPIView):
     def get_queryset(self):
         return Record.objects.filter(
             user=self.request.user,
-            date__month=datetime.date.today().month
         )
 
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         today = datetime.date.today()
-        month_time = get_total_time(queryset) / 3600
+        month_queryset = queryset.filter(date__month=today.month)
+        month_time = get_total_time(month_queryset) / 3600
 
         queryset = queryset.filter(date__gte=(today - datetime.timedelta(days=7)))
         week_time = get_total_time(queryset) / 3600

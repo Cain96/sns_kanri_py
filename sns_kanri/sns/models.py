@@ -14,7 +14,7 @@ class SNS(BaseModel):
         ]
 
     name = models.CharField("名称", max_length=256)
-    color = models.CharField("カラー", max_length=7, blank=True)
+    color = models.CharField("カラー", max_length=9, blank=True)
 
     def __str__(self):
         return self.name

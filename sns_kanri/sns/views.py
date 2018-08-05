@@ -19,7 +19,7 @@ class SNSViewSet(viewsets.ModelViewSet):
     """SNSのview_set"""
     permission_classes = (IsAuthenticated,)
     serializer_class = SNSSerializer
-    queryset = SNS.objects.all()
+    queryset = SNS.objects.filter(enabled=True)
 
 
 class RecordViewSet(viewsets.ModelViewSet):

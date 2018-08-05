@@ -11,7 +11,8 @@ class SNSSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
-            'color'
+            'color',
+            'enabled'
         )
 
 

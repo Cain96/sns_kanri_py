@@ -19,21 +19,7 @@ class SNSViewSet(viewsets.ModelViewSet):
     """SNSのview_set"""
     permission_classes = (IsAuthenticated,)
     serializer_class = SNSSerializer
-    queryset = SNS.objects.filter(enabled=True)
-
-    def get_queryset(self):
-        key = self.request.GET.get(key="all", default=None)
-        queryset = super().get_queryset()
-        if key:
-            return queryset
-        return queryset.filter(enabled=True)
-
-    def get_queryset(self):
-        key = self.request.GET.get(key="all", default=None)
-        queryset = super().get_queryset()
-        if key:
-            return queryset
-        return queryset.filter(enabled=True)
+    queryset = SNS.objects.all()
 
     def get_queryset(self):
         key = self.request.GET.get(key="all", default=None)

@@ -28,6 +28,13 @@ class SNSViewSet(viewsets.ModelViewSet):
             return queryset
         return queryset.filter(enabled=True)
 
+    def get_queryset(self):
+        key = self.request.GET.get(key="all", default=None)
+        queryset = super().get_queryset()
+        if key:
+            return queryset
+        return queryset.filter(enabled=True)
+
 
 class RecordViewSet(viewsets.ModelViewSet):
     """Recordの一覧"""
